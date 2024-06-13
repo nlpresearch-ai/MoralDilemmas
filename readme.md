@@ -26,11 +26,11 @@ We used gpt-4-turbo as demonstration below. We also provided our model responses
 
 3. Analyze the model response from 1 with deilemmas details from 2 based on the five theories
 - dataset with six model responses: ```eval/model_response_from_eval/all_models_eval_on_dilemmas_with_detail_by_action.csv```
-- (for replication purpose: eval only first five dilemma) command: ```python analysis/analysis_for_model_responses_five_theories/analyze_model_resp_with_five_theories.py -i eval/model_response_from_eval/gpt4_eval_on_dilemmas_with_action_separate.csv -o analysis/analysis_for_model_responses_five_theories/model_resp.csv -m gpt4```
+- (Replication purpose: eval only first five dilemma) command: ```python analysis/analysis_for_model_responses_five_theories/analyze_model_resp_with_five_theories.py -i eval/model_response_from_eval/gpt4_eval_on_dilemmas_with_action_separate.csv -o analysis/analysis_for_model_responses_five_theories/model_resp.csv -m gpt4```
 - (Replication purpose: provided all models responses for analysis) command: ```python analysis/analysis_for_model_responses_five_theories/analyze_model_resp_with_five_theories.py -i eval/model_response_from_eval/all_models_eval_on_dilemmas_with_detail_by_action.csv -o analysis/analysis_for_model_responses_five_theories/model_resp_all_models.csv -m gpt4 gpt35 llama2 llama3 mixtral_rerun claude```
 
 4. Plot the graph with five theories
-- (replication purpose: eval only first five dilemma) command: ```python analysis/analysis_for_model_responses_five_theories/create_plot.py -i analysis/analysis_for_model_responses_five_theories/model_resp.csv -o analysis/analysis_for_model_responses_five_theories/graph```
+- (Replication purpose: eval only first five dilemma) command: ```python analysis/analysis_for_model_responses_five_theories/create_plot.py -i analysis/analysis_for_model_responses_five_theories/model_resp.csv -o analysis/analysis_for_model_responses_five_theories/graph```
 - (Replication purpose: provided all models responses for analysis) command: ```python analysis/analysis_for_model_responses_five_theories/create_plot.py -i analysis/analysis_for_model_responses_five_theories/model_resp_all_models.csv -o analysis/analysis_for_model_responses_five_theories/graph```
 
 ## Case 2: Evaluate model preferences on everyday dilemmas based on the given principle
