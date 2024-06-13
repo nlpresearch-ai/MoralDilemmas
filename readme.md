@@ -79,7 +79,7 @@ python eval_for_system_prompt_modulation/get_values_for_principle.py \
 1. ``input_principle_file``: ``data/principle_openai.csv``
 2. ``model``: ``gpt-4-0125-preview``
 3. ``replicaiton_purpose``: [``full``, ``only_first_two_principles``]
-4. 
+   
 **Optional Arguments:**
 1. ``api_key``: you can input OpenAI API key as an argument. Use a .env file or set as a global variable
 
