@@ -1,12 +1,12 @@
 # MoralDilemmas 
 
-Dataset: ```data/dilemmas_with_detail_by_action.csv```
+**Dataset**: ```data/dilemmas_with_detail_by_action.csv```
 
-Croissant metadata: ```metadata/crossiant```
+**Croissant metadata**: ```metadata/crossiant```
 
-There are three use cases -- 1. evaluate model preferences on everyday dilemmas 2. evaluate model preference on dilemmas based on the given principle 3. evaluate the model's steerability by system prompt modulation on each given principle
+**Three use cases** -- 1. evaluate model preferences on everyday dilemmas 2. evaluate model preference on dilemmas based on the given principle 3. evaluate the model's steerability by system prompt modulation on each given principle
 
-We used ``gpt-4-turbo`` as demonstrated below. We also provided our model responses on our dilemmas dataset run by five models, and some corresponding analysis datasets for replication purposes to avoid running them again through the flag (``replication_purpose``).
+We used ``gpt-4-turbo`` as demonstration below. We also provided our model responses on our dilemmas dataset run by five models, and some corresponding analysis datasets for replication purpose to avoid running them again through the flag (``replication_purpose``).
 
 ## Setup the environment
 ```
@@ -14,9 +14,7 @@ $ conda create --name <env> --file requirements.txt
 ```
 
 ## Case 1: Evaluate model preferences on everyday dilemmas
-1. Evaluate the gpt-4-turbo model on our dilemma dataset. 
-- You can set the output file div be `eval/model_response_from_eval`. Here, we implemented the OpenAI client code, you can set the model name e.g. `gpt-4-turbo`. We also have a replication purpose flag to allow you to run the evaluation on the first five lines only. 
-
+### 1. Evaluate the gpt-4-turbo model on our dilemma dataset.
 ```
 python eval/evaluate_model_on_dilemma.py \
 --output_jsonl_file_div <output_jsonl_file_div> \ 
@@ -25,11 +23,14 @@ python eval/evaluate_model_on_dilemma.py \
 --replication_purpose <full/only_first_five> \
 --api_key <optional_you_can_set_as_.env_or_global>
 ```
+**Required Arguments with suggestions:**
+1. ``output_jsonl_file_div``: ``eval/model_response_from_eval``. 
+2. ``model name``: `gpt-4-turbo`.
+3. ``replicaiton_purpose``: [``full``, ``only_first_five``]: [full dilemmas dataset, only first five dilemmas]
+**optional Arguments:**
+1. ``api_key``: you can input openai api key as argument. Use an .env file or set as global variable
 
-2. Combine model response from 1 to get the details of the dilemma for each action. 
-- You can use the model response file generated from step 1 on the output_jsonl_file_div `eval/model_response_from_eval`. The MoralDilemmas dataset can be found in `data/dilemmas_with_detail_by_action.csv`. If you chose to do `only_first_five` in step 1, you will need the same subset of MoralDilemma to prevent error (can be found in `data/dilemmas_with_detail_by_action_test.csv`).
-- You can set this combined model response file on `eval/model_response_from_eval` for reference. The data of `<model_name>_eval_on_dilemmas_with_action_separate.csv` will be created.
-
+### 2. Combine model response from 1 to get the dilemmas details for each action. 
 ```
 python eval/combine_model_eval_with_dilemmas_action_separate.py \
 --input_model_resp_file <step_1_output_jsonl_file> \
@@ -37,34 +38,34 @@ python eval/combine_model_eval_with_dilemmas_action_separate.py \
 --output_analysis_file <output_analysis_file_div> \
 --model <model_name_for_variable>
 ```
+**Required Arguments with suggestions:**
+1. ``input_model_resp_file``: `eval/model_response_from_eval`
+2. ``input_dilemma_file``: `data/dilemmas_with_detail_by_action.csv` or `data/dilemmas_with_detail_by_action_test.csv` if use only first five data in step 1
+3. ``output_analysis_file``: `eval/model_response_from_eval`. The data of `<model_name>_eval_on_dilemmas_with_action_separate.csv` will be created.
 
-3. Analyze the combined model responses file with dilemmas details from step 2 based on the five theories.
-- For input, you can use the output file from step 2, which can be found in ``eval/model_response_from_eval/<model_name>_eval_on_dilemmas_with_action_separate.csv``. We also provided the evaluated MoralDilemma dataset with six model responses in ```eval/model_response_from_eval/all_models_eval_on_dilemmas_with_detail_by_action.csv```
-- For models, input the model names used in fields from previous steps e.g. gpt4 to analyze. For our provided MoralDilemma dataset with six models responses, you could have ``gpt4 gpt35 llama2 llama3 mixtral_rerun claude``
-
+### 3. Analyze the combined model responses file with dilemmas details from step 2 based on the five theories.
 ```
 python analysis/analysis_for_model_responses_five_theories/analyze_model_resp_with_five_theories.py \
 --input_model_resp_file <output_from_step_2> \
 --output_analysis_file <e.g.analysis/analysis_for_model_responses_five_theories/model_resp.csv> \
---models <model_name(s)>
+--models <model_names>
 ```
+**Required Arguments with suggestions:**
+1. ``input_model_resp_file``: use output file from step 2. e.g., ``eval/model_response_from_eval/<model_name>_eval_on_dilemmas_with_action_separate.csv``. We also provided the six model responses in ```eval/model_response_from_eval/all_models_eval_on_dilemmas_with_detail_by_action.csv```
+2. ``models``: ``gpt4``; For six models, ``gpt4 gpt35 llama2 llama3 mixtral_rerun claude``
 
-4. Plot the graphs from the analyzed files with five theory dimensions.
-- You can choose the analyzed files by step 3 in the folder ``analysis/analysis_for_model_responses_five_theories/``
-
+### 4. Plot the graphs from the analyzed files with five theories dimensions.
 ```
 python analysis/analysis_for_model_responses_five_theories/create_plot.py \
 --input_analysis_file <output_path_in_step_3/model_resp.csv> \
 --output_graph_div <path_for_graphs>
 ```
+**Required Arguments with suggestions:**
+1. ``input_analysis_file``: Output from step 3 e.g., ``analysis/analysis_for_model_responses_five_theories/``
 
 ## Case 2: Evaluate model preferences on everyday dilemmas based on the given principle
 
-1. Get the relevant values for each principle from collected values by prompting the model 10 times.
-- To provide a value list, we used 301 values with the five theories dimensions data as default: ```data/values.csv```
-- For input principle file, you can select the principle files from folder ``data``. If you want to continue to analyze with the OpenAI model, you can use the OpenAI ModelSpec: ``data/principle_openai.csv`
-- For model, we use ``gpt-4-0125-preview`` to help us to get relevant values from our value list. You can also use other models.
-- For replication purpose, you can choose to run ```only_first_two_principles``` for debug.
+### 1. Get the relevant values for each principle from collected values by prompting the model 10 times.
 ```
 python eval_for_system_prompt_modulation/get_values_for_principle.py \
 --input_principle_file <data/principle_company.csv> \
@@ -73,18 +74,25 @@ python eval_for_system_prompt_modulation/get_values_for_principle.py \
 --replication_purpose <full_/or/_only_first_two_principles>\
 --api_key <optional_you_can_set_as_.env_or_global>
 ```
+**Required Arguments with suggestions:**
+1. ``input_principle_file``: ``data/principle_openai.csv``
+2. ``model``: ``gpt-4-0125-preview``
+3. ``replicaiton_purpose``: [``full``, ``only_first_two_principles``]
+**optional Arguments:**
+1. ``api_key``: you can input openai api key as argument. Use an .env file or set as global variable
 
-2. Calculate the value's relevance by the empirical probabilities from the 10 model responses in step 1.
-- For input, it is the output file from step 1. If you follow the previous step, it could be ``eval_for_system_prompt_modulation/values_and_system_prompt_for_principle/principle_openai.csv``
+<!-- - To provide a value list, we used 301 values with the five theories dimensions data as default: ```data/values.csv``` -->
+
+### 2. Calculate the value's relevance by the empirical probabiltiy from the 10 model responses in step 1.
 ```
 python eval_for_system_prompt_modulation/calc_value_relevance.py \
 --input_system_prompt_file <output_from_step_1> \
 --output_jsonl_file_div <e.g._eval_for_system_prompt_modulation/values_and_system_prompt_for_principle>
 ```
+**Required Arguments with suggestions:**
+1. ``input_system_prompt_file``: Output from step 1 e.g., ``eval_for_system_prompt_modulation/values_and_system_prompt_for_principle/principle_openai.csv``
 
-3. Get the values conflicts and relevant dilemmas for each principle. 
-- For input principle file, we use output file from Step 2 to get the values per principle. You can find from ``eval_for_system_prompt_modulation/values_and_system_prompt_for_principle/<model_name>_clean.csv``
-- For input dilemma file, we use output file from Step 2 of Case 1 to get the moral responses on MoralDilemmas. Here, we provided the six model responses on our MoralDilemmas dataset: ```eval/model_response_from_eval/all_models_eval_on_dilemmas_with_detail_by_action.csv```.
+### 3. Get the values conflicts and relevant dilemmas for each principle. 
 ```
 python eval_for_system_prompt_modulation/get_values_conflicts_and_relevant_dilemmas_for_principle.py \
 --input_principle_file <output_from_step_2_e.g._principle_company_clean.csv> \
@@ -92,11 +100,12 @@ python eval_for_system_prompt_modulation/get_values_conflicts_and_relevant_dilem
 --output_jsonl_file_div <eval_for_system_prompt_modulation/values_and_system_prompt_for_principle> \
 --model <model_name> \
 ```
+**Required Arguments with suggestions:**
+1. ``input_principle_file``: Output from step 2. e.g., ``eval_for_system_prompt_modulation/values_and_system_prompt_for_principle/<model_name>_clean.csv``
+2. ``input_dilemma_file``: Output from Step 2 of Case 1. We also provided the six models responses: ```eval/model_response_from_eval/all_models_eval_on_dilemmas_with_detail_by_action.csv```
 
 ## Case 3: Evaluate the model's steerability by system prompt modulation on each given principle
-1. Generate system prompts for each principle -- one for steering to supporting values and one for steering to opposing value for each principle
-- For input, it is from the output by case 2 step 3: ``<output_path>/principle_gpt4_eval_with_values_conflicts_and_dilemma.csv``
-- 
+### 1. Generate system prompts for each principle -- one for steering to supporting values and one for steerting to opposing value for each principle
 ```
 python eval_for_system_prompt_modulation generate_system_prompts_for_principle.py \ 
 --input_system_prompt_file <output_from_step_3_in_case_2> \
@@ -104,10 +113,12 @@ python eval_for_system_prompt_modulation generate_system_prompts_for_principle.p
 --model gpt-4-turbo \
 --api_key <optional_you_can_set_as_.env_or_global>
 ```
-2. Evaluate models on relevant dilemmas for each principle by each set of system prompts.
-- For input system prompt file, it is the output file from step 1: ``<output_path>/<model>_with_system_prompts.csv``
-- For dilemma file, it is our MoralDilemmas data
-- For model, input the model we want to use for evaluation: e.g. ``gpt-4-turbo``
+**Required Arguments with suggestions:**
+1. ``input_system_prompt_file``: Output from step 3 of case 2: e.g.,``<output_path>/principle_gpt4_eval_with_values_conflicts_and_dilemma.csv``
+
+**Optional Arguments:**
+1. ``api_key``: you can input openai api key as argument. Use an .env file or set as global variable
+### 2. Evaluate models on relevant dilemmas for each principle by each set of system prompt.
 ```
 python eval_for_system_prompt_modulation/evaluate_model_on_system_prompt.py \
 --input_system_prompt_file <output_from_step_1> \
@@ -116,12 +127,17 @@ python eval_for_system_prompt_modulation/evaluate_model_on_system_prompt.py \
 --model gpt-4-turbo \
 --api_key <optional_you_can_set_as_.env_or_global>
 ```
-- output: ``eval_for_system_prompt_modulation/model_response_on_system_prompt/{model}_eval.csv``
+**Required Arguments with suggestions:**
+1. ``input_system_prompt_file``: Output from step 1: e.g., ``<output_path>/<model>_with_system_prompts.csv``
+2. ``input_dilemma_file``: MoralDilemmas data: ```data/dilemmas_with_detail_by_action.csv``
+3. ``model``: ``gpt-4-turbo``
 
-3. Analyze the model responses from step 2 to evaluate the steerability of the model.
-- For input principle file, it is the output from step 2. You could find it on ``eval_for_system_prompt_modulation/model_response_on_system_prompt/{model}_eval.csv``
-- For input dilemma file, we provided the six model responses on our MoralDilemma dataset: ``eval/model_response_from_eval/all_models_eval_on_dilemmas_with_detail_by_action.csv``. If you followed the whole pipeline, you could also find the file by case 1 step 1 from ``eval/model_response_from_eval/<model_name>_eval_on_dilemmas_with_detail_by_action.csv``
-- For steer, the script will analyze model responses for one set of system prompts per time. Steer == ``sup`` means that it analyzes the model responses when having system prompts steering to supporting values.
+**Optional Arguments:**
+1. ``api_key``: you can input openai api key as argument. Use an .env file or set as global variable
+
+<!-- - output: ``eval_for_system_prompt_modulation/model_response_on_system_prompt/{model}_eval.csv`` -->
+
+### 3. Analyze the model responses from step 2 to evaluate the steerability of model.
 ```
 python analysis/analysis_for_system_prompt_modulation/analyze_model_resp_on_system_prompt.py \
 --input_principle_file <output_from_step_2> \
@@ -131,14 +147,15 @@ python analysis/analysis_for_system_prompt_modulation/analyze_model_resp_on_syst
 --company_name <use_for_create_output_file_name_e.g._openai> \
 --model <the_name_used_for_field_and_also_for_output_file_name>
 ```
+**Required Arguments with suggestions:**
+1. ``input_principle_file``: Output from step 2. e.g., ``eval_for_system_prompt_modulation/model_response_on_system_prompt/{model}_eval.csv``
+2. ``input_dilemma_file``: Output from Step 1 in Case 1: ``eval/model_response_from_eval/<model_name>_eval_on_dilemmas_with_detail_by_action.csv`` or our provided six model responses: ``eval/model_response_from_eval/all_models_eval_on_dilemmas_with_detail_by_action.csv``
+3. ``steer``: ``sup`` means that it analyzes the model responses when having system prompts steering to supporing values.
 
 <!-- - output: ```{output_file_div}/principle_{company}_{model_name}_eval_with_system_prompt_system_prompt_sup.csv```
 - output:  ```{output_file_div}/principle_{company}_{model_name}_eval_with_system_prompt_system_prompt_opp.csv``` -->
 
-4. Create a plot from the analysis files from step 3. 
-- We used the two output analysis files from step 3 -- one is from steering to supporting value; another one is from steering to opposing value.
-- For sup and opp, you can find the output files ``principle_<companyname>_<modelname>_eval_with_system_prompt_system_prompt_<sup/opp>_value.csv`` from step 3 on: ``analysis/analysis_for_system_prompt_modulation/``. We also provided the complete files on: ``data/``
-- For replication_purpose, if you followed the pipeline and chose to evaluate only two principles in case 2 step 1, you can use `only_two_principles` here to have a better illustration of graphs. If you use our provided complete files, you could go for `full`.
+### 4. Create plot from the analysis files from step 3. 
 ```
 python analysis/analysis_for_system_prompt_modulation/create_plot.py \ 
 --input_support_value_file <path/...system_prompt_sup_value.csv> \ 
@@ -146,3 +163,9 @@ python analysis/analysis_for_system_prompt_modulation/create_plot.py \
 --output_graph_div <analysis/analysis_for_system_prompt_modulation/> \
 --replication_purpose <only_two_principles/or/full>
 ```
+**Required Arguments with suggestions:**
+1. ``input_[support/oppose]_value_file``: Output from step 3 with steer == [``sup``/``opp``]: ``principle_<companyname>_<modelname>_eval_with_system_prompt_system_prompt_[sup/opp]_value.csv``
+2. ``replication_purpose``: [`only_two_principles`/`full`]. Depends on the evaluation on Step 1 in case 2
+<!-- - We used the two output analysis files from step 3 -- one is from steering to supporting value; anoter one is from steering to opposing value.
+- For sup and opp, you can find the output files ``principle_<companyname>_<modelname>_eval_with_system_prompt_system_prompt_<sup/opp>_value.csv`` from step 3 on: ``analysis/analysis_for_system_prompt_modulation/``. We also provided the complete files on: ``data/`` -->
+<!-- - For replication_purpose, if you followed the pipeline and choose to evaluate only two principles in case 2 step 1, you can use `only_two_principles` here to have better illustration of graphs. If you used our provided complete files, you can go for `full`. -->
